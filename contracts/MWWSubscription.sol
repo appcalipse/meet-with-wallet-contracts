@@ -7,7 +7,9 @@ import "hardhat/console.sol";
 library MWWStructs {
    struct Subscription {
         address owner;
-        uint8 planId; //purposely an int so it can be expanded in the future
+        // TODO: having uint8 here doesn't give you advantage of less storage. ping me if you're curious why.
+        // but if you make this uint256, then you gotta modify uint8s to uint256 in RegistarBase contract as well for planIds for the consistency.
+        uint8 planId; //purposely an int so it can be expanded in the future. 
         uint256 expiryTime; //valid until when
         string domain;
         string configIpfsHash;
@@ -102,17 +104,14 @@ contract MWWSubscription is Ownable {
         domainDelegates[domain] = auxDelegates;
     }
 
-    // TODO: from uint8 to uint256
     function subscribe(uint8 planId, address planOwner, uint256 duration, string memory domain, string memory ipfsHash) public onlyRegisterContract returns (MWWStructs.Subscription memory) {
         return _subscribe(planId, planOwner, duration, domain, ipfsHash);
     }
 
-    // TODO: from uint8 to uint256
     function addSubscription(uint8 planId, address planOwner, uint256 duration, string memory domain, string memory ipfsHash) public onlyAdmin returns (MWWStructs.Subscription memory) {
         return _subscribe(planId, planOwner, duration, domain, ipfsHash);
     }
 
-    // TODO: from uint8 to uint256
     function _subscribe(uint8 planId, address planOwner, uint256 duration, string memory domain, string memory ipfsHash) private returns (MWWStructs.Subscription memory) {
         
         if(subscriptions[domain].owner != address(0) && subscriptions[domain].expiryTime > block.timestamp) { // check subscription exists and is not expired
@@ -178,6 +177,7 @@ contract MWWSubscription is Ownable {
         auxDomains[0] = newDomain;
         uint8 j = 1; // TODO: make it uint256 or uint
 
+        // TODO: same pattern can be used here (Check removePlan function comments in RegistarBase contract)
         for (uint i = 0; i < accountDomains[msg.sender].length; i++){
             
             if(keccak256(bytes(accountDomains[msg.sender][i])) != keccak256(bytes(domain))) {

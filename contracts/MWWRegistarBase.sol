@@ -14,7 +14,7 @@ abstract contract MWWRegistarBase is Ownable, ReentrancyGuard {
     struct PlanInfo {
         string name;
         uint256 usdPrice;
-        uint8 planId;
+        uint8 planId; // TODO: make this to uint256
     }
 
     MWWSubscription private subscriptionContract;
@@ -24,7 +24,7 @@ abstract contract MWWRegistarBase is Ownable, ReentrancyGuard {
 
     mapping (uint8 => PlanInfo) private availablePlans;
 
-    uint8[] planIds;
+    uint8[] planIds; // make this private
 
     event MWWPurchase(address planOwner, uint256 timestamp);
 
@@ -76,7 +76,6 @@ abstract contract MWWRegistarBase is Ownable, ReentrancyGuard {
         acceptableTokenAddresses[tokenAddress] = false;
     }
 
-    // TODO: don't pass uint8 as the third argument. change it to uint256
     function addPlan(string memory _name, uint256 _usdPrice, uint8 _planId) public onlyOwner {
         // bool planAdded = false;
         // for (uint i=0; i < planIds.length; i++) {
@@ -88,7 +87,8 @@ abstract contract MWWRegistarBase is Ownable, ReentrancyGuard {
 
         // TODO: I removed the above code, too complicated for no reason. 
         // We can do something like this: Though, question, can planId be ever zero ?
-        // if yes, ping me, if not leave, this solution
+        // if yes, ping me, if not leave, this solution        
+        require(_planId != 0, "planId can't be 0");
         require(availablePlans[_planId].planId == 0, "Plan already exists");
 
         availablePlans[_planId] = PlanInfo(_name, _usdPrice, _planId);
@@ -99,17 +99,29 @@ abstract contract MWWRegistarBase is Ownable, ReentrancyGuard {
         // TODO: do we care about the order of elements in planIds ? 
         // If not, the code here can be changed to:
         
-        uint8[] memory auxPlans = new uint8[](planIds.length - 1);
-        uint8 j = 0;
+        // Below modification increases gas costs of `addPlan` by 23000 GAS approximately.
+        // Though, removePlan decreases by 16000. So with my solution, we lose 7,000 GAS. 
+        // Depends on if you want my better-readability solution or not for `removePlan`.
 
-        for(uint8 i = 0; i < planIds.length; i++) {
-            if (planIds[i] != _planId) {
-                auxPlans[j] = planIds[i];
-                j = j + 1;
-            }
-        }
-        delete availablePlans[_planId];
-        planIds = auxPlans;
+        // ====== modified code =======
+        //// we add one more field `index` on the struct and when we add new plan, we store the index where it would go on planIds
+        // uint index = availablePlans[_planId].index; 
+        // planIds[index] = planIds[planIds.length-1];
+        // planIds.pop();
+        // delete availablePlans[_planId];
+
+        // ======== original code ========
+        // uint8[] memory auxPlans = new uint8[](planIds.length - 1);
+        // uint8 j = 0;
+
+        // for(uint8 i = 0; i < planIds.length; i++) {
+        //     if (planIds[i] != _planId) {
+        //         auxPlans[j] = planIds[i];
+        //         j = j + 1;
+        //     }
+        // }
+        // delete availablePlans[_planId];
+        // planIds = auxPlans;
     }
 
     function purchaseWithNative(uint8 planId, address planOwner, uint256 duration, string memory domain, string memory ipfsHash) public payable returns (MWWStructs.Subscription memory) {
@@ -130,7 +142,6 @@ abstract contract MWWRegistarBase is Ownable, ReentrancyGuard {
        return _purchase(planId, planOwner, duration, domain, ipfsHash);
     }
 
-    // TODO: change uint8 to uint256
     function purchaseWithToken(address tokenAddress, uint8 planId, address planOwner, uint256 duration, string memory domain, string memory ipfsHash) public payable returns (MWWStructs.Subscription memory) {
         
         require(acceptableTokenAddresses[tokenAddress], "Token not accepted");
