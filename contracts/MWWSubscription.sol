@@ -20,7 +20,7 @@ contract MWWSubscription is Ownable {
     mapping (address => bool) private admins;
     mapping (string => MWWStructs.Subscription) private subscriptions;
     mapping (address => string[]) private accountDomains;
-    address private registerContract;
+    address private registerContract; // TODO: make this public, why hide it ?
     mapping (string => address[]) private domainDelegates;
 
     event MWWSubscribed(address indexed subscriber, uint8 planId, uint256 expiryTime, string domain);
@@ -45,6 +45,7 @@ contract MWWSubscription is Ownable {
         registerContract = _address;
     }
 
+    // TODO: remove this if you make the registerContract public
     function getRegisterContract() public view returns (address) {
         return registerContract;
     }
@@ -52,7 +53,8 @@ contract MWWSubscription is Ownable {
     function removeAdmin(address admin) public onlyOwner {
         admins[admin] = false;
     }
-
+    
+    // TODO: okay, so admin can add someone as admin, but only contract creator can remove the admin.
     function addAdmin(address admin) public onlyAdmin {
         admins[admin] = true;
     }
@@ -60,6 +62,7 @@ contract MWWSubscription is Ownable {
     function isDelegate(string memory domain) public view returns (bool) {
         address[] memory delegates = domainDelegates[domain];
 
+        // TODO: just more code checking the length. I'd remove this.
         if (delegates.length == 0) {
             return false;
         }
@@ -80,6 +83,7 @@ contract MWWSubscription is Ownable {
         return domainDelegates[domain];
     }
 
+    // TODO: this can be done by anyone.
     function addDelegate(string memory domain, address delegate) public {
         domainDelegates[domain].push(delegate);
     }
@@ -87,7 +91,7 @@ contract MWWSubscription is Ownable {
      function removeDelegate(string memory domain, address delegate) public {
         require(isAllowedToManageDomain(domain), "You are not allowed to do this");
         
-        uint8 j = 0;
+        uint8 j = 0; // TODO: again, uint8 no need, make it uint256
         address[] memory auxDelegates = new address[](domainDelegates[domain].length - 1);
         for(uint8 i = 0; i < domainDelegates[domain].length; i++) {
             if (domainDelegates[domain][i] != delegate) {
@@ -98,14 +102,17 @@ contract MWWSubscription is Ownable {
         domainDelegates[domain] = auxDelegates;
     }
 
+    // TODO: from uint8 to uint256
     function subscribe(uint8 planId, address planOwner, uint256 duration, string memory domain, string memory ipfsHash) public onlyRegisterContract returns (MWWStructs.Subscription memory) {
         return _subscribe(planId, planOwner, duration, domain, ipfsHash);
     }
 
+    // TODO: from uint8 to uint256
     function addSubscription(uint8 planId, address planOwner, uint256 duration, string memory domain, string memory ipfsHash) public onlyAdmin returns (MWWStructs.Subscription memory) {
         return _subscribe(planId, planOwner, duration, domain, ipfsHash);
     }
 
+    // TODO: from uint8 to uint256
     function _subscribe(uint8 planId, address planOwner, uint256 duration, string memory domain, string memory ipfsHash) private returns (MWWStructs.Subscription memory) {
         
         if(subscriptions[domain].owner != address(0) && subscriptions[domain].expiryTime > block.timestamp) { // check subscription exists and is not expired
@@ -154,6 +161,7 @@ contract MWWSubscription is Ownable {
             registeredAt: subs.registeredAt
         });
 
+        // TODO: why not delete subscriptions[domain] instead of the below ?
         subscriptions[domain] = MWWStructs.Subscription({
             owner: address(0),
             planId: 0,
@@ -163,9 +171,12 @@ contract MWWSubscription is Ownable {
             registeredAt: 0
         });
 
+        // TODO: imagine, that instead of owner, its his delegate who is calling this function.
+        // because of that, the below for loop, will not execute. I think, it's still should be 
+        // subs.owner instead of msg.senders below. Don't you think ?
         string[] memory auxDomains = new string[](accountDomains[subs.owner].length);
         auxDomains[0] = newDomain;
-        uint8 j = 1;
+        uint8 j = 1; // TODO: make it uint256 or uint
 
         for (uint i = 0; i < accountDomains[msg.sender].length; i++){
             
