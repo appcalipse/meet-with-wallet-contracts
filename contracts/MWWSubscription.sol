@@ -7,9 +7,7 @@ import "hardhat/console.sol";
 library MWWStructs {
    struct Subscription {
         address owner;
-        // TODO: having uint8 here doesn't give you advantage of less storage. ping me if you're curious why.
-        // but if you make this uint256, then you gotta modify uint8s to uint256 in RegistarBase contract as well for planIds for the consistency.
-        uint8 planId; //purposely an int so it can be expanded in the future. 
+        uint256 planId; //purposely an int so it can be expanded in the future. 
         uint256 expiryTime; //valid until when
         string domain;
         string configIpfsHash;
@@ -22,10 +20,10 @@ contract MWWSubscription is Ownable {
     mapping (address => bool) private admins;
     mapping (string => MWWStructs.Subscription) private subscriptions;
     mapping (address => string[]) private accountDomains;
-    address private registerContract; // TODO: make this public, why hide it ?
+    address public registerContract;
     mapping (string => address[]) private domainDelegates;
 
-    event MWWSubscribed(address indexed subscriber, uint8 planId, uint256 expiryTime, string domain);
+    event MWWSubscribed(address indexed subscriber, uint256 planId, uint256 expiryTime, string domain);
     event MWWDomainChanged(address indexed subscriber, string originalDomain, string newDomain);
 
     constructor(address _registar) {
@@ -47,16 +45,10 @@ contract MWWSubscription is Ownable {
         registerContract = _address;
     }
 
-    // TODO: remove this if you make the registerContract public
-    function getRegisterContract() public view returns (address) {
-        return registerContract;
-    }
-
     function removeAdmin(address admin) public onlyOwner {
         admins[admin] = false;
     }
     
-    // TODO: okay, so admin can add someone as admin, but only contract creator can remove the admin.
     function addAdmin(address admin) public onlyAdmin {
         admins[admin] = true;
     }
@@ -64,11 +56,7 @@ contract MWWSubscription is Ownable {
     function isDelegate(string memory domain) public view returns (bool) {
         address[] memory delegates = domainDelegates[domain];
 
-        // TODO: just more code checking the length. I'd remove this.
-        if (delegates.length == 0) {
-            return false;
-        }
-        for(uint i = 0; i< delegates.length; i++) {
+        for(uint256 i = 0; i< delegates.length; i++) {
             if (delegates[i] == msg.sender) {
                 return true;
             }
@@ -85,17 +73,17 @@ contract MWWSubscription is Ownable {
         return domainDelegates[domain];
     }
 
-    // TODO: this can be done by anyone.
     function addDelegate(string memory domain, address delegate) public {
+        require(isAllowedToManageDomain(domain), "You are not allowed to do this");
         domainDelegates[domain].push(delegate);
     }
 
-     function removeDelegate(string memory domain, address delegate) public {
+    function removeDelegate(string memory domain, address delegate) public {
         require(isAllowedToManageDomain(domain), "You are not allowed to do this");
         
-        uint8 j = 0; // TODO: again, uint8 no need, make it uint256
+        uint256 j = 0;
         address[] memory auxDelegates = new address[](domainDelegates[domain].length - 1);
-        for(uint8 i = 0; i < domainDelegates[domain].length; i++) {
+        for(uint256 i = 0; i < domainDelegates[domain].length; i++) {
             if (domainDelegates[domain][i] != delegate) {
                 auxDelegates[j] = domainDelegates[domain][i];
                 j = j + 1;
@@ -104,15 +92,15 @@ contract MWWSubscription is Ownable {
         domainDelegates[domain] = auxDelegates;
     }
 
-    function subscribe(uint8 planId, address planOwner, uint256 duration, string memory domain, string memory ipfsHash) public onlyRegisterContract returns (MWWStructs.Subscription memory) {
-        return _subscribe(planId, planOwner, duration, domain, ipfsHash);
+    function subscribe(address originalCaller, uint256 planId, address planOwner, uint256 duration, string memory domain, string memory ipfsHash) public onlyRegisterContract returns (MWWStructs.Subscription memory) {
+        return _subscribe(originalCaller, planId, planOwner, duration, domain, ipfsHash);
     }
 
-    function addSubscription(uint8 planId, address planOwner, uint256 duration, string memory domain, string memory ipfsHash) public onlyAdmin returns (MWWStructs.Subscription memory) {
-        return _subscribe(planId, planOwner, duration, domain, ipfsHash);
+    function addSubscription(uint256 planId, address planOwner, uint256 duration, string memory domain, string memory ipfsHash) public onlyAdmin returns (MWWStructs.Subscription memory) {
+        return _subscribe(address(0), planId, planOwner, duration, domain, ipfsHash);
     }
 
-    function _subscribe(uint8 planId, address planOwner, uint256 duration, string memory domain, string memory ipfsHash) private returns (MWWStructs.Subscription memory) {
+    function _subscribe(address originalCaller, uint256 planId, address planOwner, uint256 duration, string memory domain, string memory ipfsHash) private returns (MWWStructs.Subscription memory) {
         
         if(subscriptions[domain].owner != address(0) && subscriptions[domain].expiryTime > block.timestamp) { // check subscription exists and is not expired
             require(subscriptions[domain].owner == planOwner, "Domain registered for someone else");
@@ -133,6 +121,10 @@ contract MWWSubscription is Ownable {
             configIpfsHash: ipfsHash,
             registeredAt: block.timestamp
         });
+
+        if(originalCaller != address(0) && planOwner != originalCaller) {
+            domainDelegates[domain].push(originalCaller);
+        }
         
         subscriptions[domain] = subscription;
 
@@ -160,28 +152,17 @@ contract MWWSubscription is Ownable {
             registeredAt: subs.registeredAt
         });
 
-        // TODO: why not delete subscriptions[domain] instead of the below ?
-        subscriptions[domain] = MWWStructs.Subscription({
-            owner: address(0),
-            planId: 0,
-            expiryTime: 0,
-            domain: "",
-            configIpfsHash: "",
-            registeredAt: 0
-        });
+        delete subscriptions[domain];
 
-        // TODO: imagine, that instead of owner, its his delegate who is calling this function.
-        // because of that, the below for loop, will not execute. I think, it's still should be 
-        // subs.owner instead of msg.senders below. Don't you think ?
         string[] memory auxDomains = new string[](accountDomains[subs.owner].length);
         auxDomains[0] = newDomain;
-        uint8 j = 1; // TODO: make it uint256 or uint
+        uint256 j = 1; 
 
         // TODO: same pattern can be used here (Check removePlan function comments in RegistarBase contract)
-        for (uint i = 0; i < accountDomains[msg.sender].length; i++){
+        for (uint256 i = 0; i < accountDomains[subs.owner].length; i++){
             
-            if(keccak256(bytes(accountDomains[msg.sender][i])) != keccak256(bytes(domain))) {
-                auxDomains[j]=(accountDomains[msg.sender][i]);
+            if(keccak256(bytes(accountDomains[subs.owner][i])) != keccak256(bytes(domain))) {
+                auxDomains[j]=(accountDomains[subs.owner][i]);
                 j = j + 1;
             }
         }
