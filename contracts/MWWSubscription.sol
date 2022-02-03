@@ -19,8 +19,8 @@ contract MWWSubscription is Ownable {
 
     mapping (address => bool) private admins;
     mapping (string => MWWStructs.Subscription) public subscriptions;
-    mapping (address => string[]) public accountDomains;
-    mapping (string => address[]) public domainDelegates;
+    mapping (address => string[]) private accountDomains;
+    mapping (string => address[]) private domainDelegates;
 
     address public registerContract;
     
@@ -214,5 +214,13 @@ contract MWWSubscription is Ownable {
     
     function isSubscriptionActive(string calldata domain) public view returns (bool) {
         return subscriptions[domain].expiryTime > block.timestamp;
+    }
+
+    function getDomainsForAccount(address account) public view returns (string[] memory) {
+        return accountDomains[account];
+    }
+
+    function getDelegatesForDomain(string memory domain) public view returns (address[] memory) {
+        return domainDelegates[domain];
     }
 }

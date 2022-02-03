@@ -35,7 +35,6 @@ describe("MWWRegistar", async () => {
     const plan = plans[0]
     expect(plan.name).to.eq("PRO")
     expect(plan.usdPrice).to.eq(BigNumber.from(30))
-    expect(plan.planId).to.eq(1)
   });
 
   it("should fail to add plan", async () => {
@@ -92,12 +91,12 @@ describe("MWWRegistar", async () => {
   it("should change plan price", async () => {
     await instance.addPlan("PRO", 30, 1)
     const plans = await instance.getAvailablePlans()
-    expect(plans[0].planId).to.eq(1)
+    expect(plans[0].name).to.eq("PRO")
     expect(plans[0].usdPrice).to.eq(BigNumber.from(30))
     await instance.removePlan(0, 1)
     await instance.addPlan("PRO", 50, 1)
     const plans2 = await instance.getAvailablePlans()
-    expect(plans2[0].planId).to.eq(1)
+    expect(plans2[0].name).to.eq("PRO")
     expect(plans2[0].usdPrice).to.eq(BigNumber.from(50))
   });
 
@@ -132,7 +131,7 @@ describe("MWWRegistar", async () => {
     const userBalance = await usdc.balanceOf(user.address)
     expect(userBalance).to.eq(40*10**6)
 
-    const sub = await subscriptionContract.getSubscription("look at me")
+    const sub = await subscriptionContract.subscriptions("look at me")
     expect(sub.expiryTime).to.equal(Number(sub.registeredAt) + 2*YEAR_IN_SECONDS)
     
     await instance.connect(user).purchaseWithToken(usdc.address, 1, user.address, Math.round(YEAR_IN_SECONDS/3), "look at me2", "hash")
@@ -141,10 +140,12 @@ describe("MWWRegistar", async () => {
   });
 
   it("should fail to buy with non accepted token", async () => { 
+    await instance.addPlan("PRO", 30, 1)
     await expect(instance.purchaseWithToken(dai.address, 1, user.address, YEAR_IN_SECONDS, "look at me", "hash")).to.be.revertedWith("Token not accepted")
   });
 
   it("should remove acceptable token", async () => {
+    await instance.addPlan("PRO", 30, 1)
     await instance.removeAcceptableToken(usdc.address)
     await expect(instance.purchaseWithToken(usdc.address, 1, user.address, YEAR_IN_SECONDS, "look at me", "hash")).to.be.revertedWith("Token not accepted")
   });
