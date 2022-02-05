@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./MWWRegistarBase.sol";
 import "hardhat/console.sol";
 
-contract MWWRegistarPolygon is MWWRegistarBase {
+contract MWWRegistarHarmony is MWWRegistarBase {
     using SafeMath for *;
 
     AggregatorV3Interface priceFeed;
