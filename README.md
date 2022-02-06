@@ -1,4 +1,4 @@
-# Advanced Sample Hardhat Project
+# Meet with Wallet smart contracts
 
 This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
 
