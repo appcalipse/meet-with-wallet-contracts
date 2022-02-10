@@ -53,7 +53,7 @@ describe("MWWRegistar", async () => {
     expect(plans2[0].name).to.eq("DAO")
   });
 
-  it("should fail to pruchase without plan", async () => {
+  it("should fail to purchase without plan", async () => {
     await expect(instance.purchaseWithNative(0, user.address, YEAR_IN_SECONDS, "look at me", "hash")).to.be.revertedWith("Plan does not exists")
   });
 
@@ -63,7 +63,7 @@ describe("MWWRegistar", async () => {
     const newAdminBalance = await provider.getBalance(newAdmin.address)
     const userBalance = await provider.getBalance(user.address)
     await instance.addPlan("PRO", 30, 1)
-    const planPriceInWei = (await instance.getNativeConvertedValue(30))
+    const [planPriceInWei,] = (await instance.getNativeConvertedValue(30))
     await instance.connect(newAdmin).purchaseWithNative(1, user.address, YEAR_IN_SECONDS, "look at me", "hash", {value: planPriceInWei})
     const newContractBalance = await provider.getBalance(instance.address)
     const newNewAdminBalance = await provider.getBalance(newAdmin.address)
@@ -77,14 +77,14 @@ describe("MWWRegistar", async () => {
 
   it("should be delegate when buying for other", async () => {
     await instance.addPlan("PRO", 30, 1)
-    const planPriceInWei = (await instance.getNativeConvertedValue(30))
+    const [planPriceInWei,] = (await instance.getNativeConvertedValue(30))
     await instance.connect(newAdmin).purchaseWithNative(1, user.address, YEAR_IN_SECONDS, "mww.eth", "hash", {value: planPriceInWei})
     const delegates = await subscriptionContract.getDelegatesForDomain("mww.eth")
     expect(delegates).to.include.ordered.members([newAdmin.address])
   });
 
   it("should calculate price properly", async () => {
-    const maticWei = (await instance.getNativeConvertedValue(30))
+    const [maticWei,] = (await instance.getNativeConvertedValue(30))
     expect(maticWei.toString()).to.eq("13623579145842458280")
   });
 
@@ -157,6 +157,17 @@ describe("MWWRegistar", async () => {
     await instance.connect(user).purchaseWithToken(dai.address, 1, user.address, YEAR_IN_SECONDS, "look at me", "hash")
   });
 
+  it("should fail to purchase without outdated price information", async () => {
+    const priceFeed = await (await ethers.getContractFactory("MockDIAOracleOutdated")).deploy()
+    instance = await (await ethers.getContractFactory("MWWRegistarMetis")).deploy([usdc.address])
+    await instance.setPriceFeed(priceFeed.address)
+    subscriptionContract = await (await ethers.getContractFactory("MWWSubscription")).deploy(instance.address)
+    await instance.setSubscriptionContract(subscriptionContract.address)
+    await instance.addPlan("PRO", 30, 1)
+    const [planPriceInWei,] = (await instance.getNativeConvertedValue(30))
+    await expect(instance.connect(newAdmin).purchaseWithNative(1, user.address, YEAR_IN_SECONDS, "look at me", "hash", {value: planPriceInWei})).to.be.revertedWith("Price is outdated")
+  });
+
   it("should withdraw", async () => {
     const provider = waffle.provider;
 
@@ -171,7 +182,7 @@ describe("MWWRegistar", async () => {
 
     await instance.connect(user).purchaseWithToken(usdc.address, 1, user.address, YEAR_IN_SECONDS, "look at me", "hash")
     await instance.connect(user).purchaseWithToken(dai.address, 1, user.address, YEAR_IN_SECONDS, "look at me", "hash")
-    const planPriceInWei = (await instance.getNativeConvertedValue(30))
+    const [planPriceInWei,] = (await instance.getNativeConvertedValue(30))
     await instance.connect(newAdmin).purchaseWithNative(1, user.address, YEAR_IN_SECONDS, "look at me", "hash", {value: planPriceInWei})
 
     const newContractEthBalance = await provider.getBalance(instance.address)

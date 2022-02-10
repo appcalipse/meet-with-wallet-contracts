@@ -9,32 +9,36 @@ import "hardhat/console.sol";
 contract MWWRegistarPolygon is MWWRegistarBase {
     using SafeMath for *;
 
-    AggregatorV3Interface priceFeed;
+    AggregatorV3Interface public priceFeed;
 
-    constructor(address[] memory acceptableTokenAddresses) MWWRegistarBase(acceptableTokenAddresses) {}
+    constructor(address[] memory acceptableTokenAddresses)
+        MWWRegistarBase(acceptableTokenAddresses)
+    {}
 
     function setPriceFeed(address _priceFeedAddress) public onlyOwner {
         priceFeed = AggregatorV3Interface(_priceFeedAddress);
     }
 
-    function getNativeConvertedValue(uint256 usdPrice) public view override returns (uint256) {
+    function getNativeConvertedValue(uint256 usdPrice)
+        public
+        view
+        override
+        returns (uint256 amountInNative, uint256 timestamp)
+    {
         (
-            uint80 roundID, 
-            int price,
-            uint startedAt,
-            uint timeStamp,
+            uint80 roundID,
+            int256 price,
+            uint256 startedAt,
+            uint256 timeStamp,
             uint80 answeredInRound
         ) = priceFeed.latestRoundData();
 
-		require(timestamp + 10800 > block.timestamp, "Price is outdated");
-
         uint8 decimals = priceFeed.decimals();
 
-        uint256 usdToWei = uint256(10 ** (18 + decimals)).div(uint(price));
+        uint256 usdToWei = uint256(10**(18 + decimals)).div(uint256(price));
 
         uint256 amountInNative = usdPrice.mul(usdToWei);
 
-        return amountInNative;
+        return (amountInNative, timeStamp / 1000);
     }
-    
 }
