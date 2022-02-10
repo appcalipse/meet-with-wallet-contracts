@@ -3,7 +3,6 @@ pragma solidity >=0.8.4 <0.9.0;
 
 import "./DIAOracleV2.sol";
 import "./MWWRegistarBase.sol";
-import "hardhat/console.sol";
 
 contract MWWRegistarMetis is MWWRegistarBase {
 	DIAOracleV2 public oracle;	

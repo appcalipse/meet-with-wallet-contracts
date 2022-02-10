@@ -1,3 +1,4 @@
+// solhint-disable-next-line
 pragma solidity 0.7.4;
 
 contract DIAOracleV2 {
