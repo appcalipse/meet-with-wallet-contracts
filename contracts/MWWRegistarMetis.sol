@@ -15,6 +15,7 @@ contract MWWRegistarMetis is MWWRegistarBase {
 
     function getNativeConvertedValue(uint256 usdPrice) public view override returns (uint256) {
 		(value, timestamp) = oracle.getValue("Metis/USD");
+		require(timestamp + 10800 > block.timestamp, "Price is outdated");
 		uint256 absoluteValue = value / 100000000;
 		uint256 perUSD = 1 / absoluteValue;
 		return perUSD * usdPrice;
