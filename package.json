@@ -1,7 +1,8 @@
 {
   "name": "meet-with-wallet-contracts",
   "scripts": {
-    "test": "hardhat test"
+    "test": "hardhat test",
+	"lint": "yarn solhint 'contracts/**/*.sol'"
   },
   "devDependencies": {
     "@chainlink/contracts": "^0.3.1",

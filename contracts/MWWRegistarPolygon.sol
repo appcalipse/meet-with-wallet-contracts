@@ -26,6 +26,8 @@ contract MWWRegistarPolygon is MWWRegistarBase {
             uint80 answeredInRound
         ) = priceFeed.latestRoundData();
 
+		require(timestamp + 10800 > block.timestamp, "Price is outdated");
+
         uint8 decimals = priceFeed.decimals();
 
         uint256 usdToWei = uint256(10 ** (18 + decimals)).div(uint(price));
