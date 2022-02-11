@@ -5,6 +5,10 @@
 // Runtime Environment's members available in the global scope.
 import { ethers } from "hardhat";
 
+const USDC = "" 
+const DAI = "" 
+const PRICE_FEED = "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0" //https://docs.chain.link/docs/matic-addresses/
+
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
   // line interface.
@@ -14,12 +18,19 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const Greeter = await ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
 
-  await greeter.deployed();
+  const Registar = await ethers.getContractFactory("MWWRegistarPolygon")
+  const registar = await Registar.deploy([USDC, DAI])
+  await registar.deployed()
+  await registar.setPriceFeed(PRICE_FEED)
 
-  console.log("Greeter deployed to:", greeter.address);
+  const Subscripton = await ethers.getContractFactory("MWWSubscription")
+  const subscriptionContract = await Subscripton.deploy(registar.address)
+  await subscriptionContract.deployed()
+  await registar.setSubscriptionContract(subscriptionContract.address)
+
+  console.log("Registar deployed to:", registar.address);
+  console.log("Subscription deployed to:", subscriptionContract.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

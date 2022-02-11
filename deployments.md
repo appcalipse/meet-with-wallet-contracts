@@ -1,0 +1,19 @@
+# Meet with Wallet deployed contracts
+
+# Harmony testnet
+
+mockDAI deployed to: 0xcc7f7D0Dd776a5ea17683eF6253DF8aCD3CBFA63
+Registar deployed to: 0x45eB1cFf81A01DdC89eE2C4ad122fFB260e0C5e1
+Subscription deployed to: 0xB95817e0F4D293E00F58eAcc4872273E9A9F764f
+
+# Polygon Mumbai
+
+mockDAI deployed to: 0x59f677F42Ddec41bd927b6D55824F2C784f11F4c
+Registar deployed to: 0x1DF8FcA6035342eeD37c3C10dcD4cC1B4030628D
+Subscription deployed to: 0xcc7f7D0Dd776a5ea17683eF6253DF8aCD3CBFA63
+
+# Metis Stardust
+
+mockDAI deployed to: 0x616afc2493F9ac91C9Da027632b19353A69E6dE4
+Registar deployed to: 0xf23C940F43f84D78C9808Bc8983d9d4C87314a35
+Subscription deployed to: 0xFA77Ed6Be160061e0a1D17C059dbB7bf7e163577

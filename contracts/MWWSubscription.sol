@@ -2,7 +2,6 @@
 pragma solidity >=0.8.4 <0.9.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "hardhat/console.sol";
 
 library MWWStructs {
     struct Subscription {

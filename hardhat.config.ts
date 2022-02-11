@@ -6,6 +6,7 @@ import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
+import "@nomiclabs/hardhat-etherscan";
 
 dotenv.config();
 
@@ -22,14 +23,34 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
+const accounts =  process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
 const config: HardhatUserConfig = {
   solidity: "0.8.4",
   networks: {
     ropsten: {
       url: process.env.ROPSTEN_URL || "",
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts
     },
+    harmonyTestnet: {
+      url: `https://api.s0.b.hmny.io`,
+      accounts
+    },
+    harmonyMainnet: {
+      url: `https://api.harmony.one`,
+      accounts
+    },
+    metisStardust: {
+      url: `https://stardust.metis.io/?owner=588`,
+      accounts
+    },
+    polygonMumbai: {
+      url: `https://rpc-mumbai.matic.today`,
+      accounts
+    },
+    matic: {
+      url: `https://polygon-rpc.com`,
+      accounts
+    }
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,

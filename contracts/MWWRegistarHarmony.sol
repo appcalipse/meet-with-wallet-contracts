@@ -2,12 +2,9 @@
 pragma solidity >=0.8.4 <0.9.0;
 
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./MWWRegistarBase.sol";
-import "hardhat/console.sol";
 
 contract MWWRegistarHarmony is MWWRegistarBase {
-    using SafeMath for *;
 
     AggregatorV3Interface priceFeed;
 
@@ -35,10 +32,10 @@ contract MWWRegistarHarmony is MWWRegistarBase {
 
         uint8 decimals = priceFeed.decimals();
 
-        uint256 usdToWei = uint256(10**(18 + decimals)).div(uint256(price));
+        uint256 usdToWei = uint256(10**(18 + decimals)) / (uint256(price));
 
-        uint256 amountInNative = usdPrice.mul(usdToWei);
+        uint256 _amountInNative = usdPrice * usdToWei;
 
-        return (amountInNative, timeStamp / 1000);
+        return (_amountInNative, timeStamp / 1000);
     }
 }
