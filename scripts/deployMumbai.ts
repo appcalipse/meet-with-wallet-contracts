@@ -25,6 +25,7 @@ async function main() {
   const registar = await Registar.deploy([mockDAI.address])
   await registar.deployed()
   await registar.setPriceFeed(PRICE_FEED)
+  await registar.addPlan('PRO', 1, 1)
 
   const Subscripton = await ethers.getContractFactory("MWWSubscription")
   const subscriptionContract = await Subscripton.deploy(registar.address)

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.4 <0.9.0;
 
-import "./DIAOracleV2Interface.sol";
+import "./helper/DIAOracleV2Interface.sol";
 import "./MWWRegistarBase.sol";
 
 contract MWWRegistarMetis is MWWRegistarBase {

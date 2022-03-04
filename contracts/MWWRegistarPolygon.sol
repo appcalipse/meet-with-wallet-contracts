@@ -5,7 +5,6 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "./MWWRegistarBase.sol";
 
 contract MWWRegistarPolygon is MWWRegistarBase {
-
     AggregatorV3Interface public priceFeed;
 
     constructor(address[] memory acceptableTokenAddresses)
@@ -32,10 +31,10 @@ contract MWWRegistarPolygon is MWWRegistarBase {
 
         uint8 decimals = priceFeed.decimals();
 
-        uint256 usdToWei = uint256(10**(18 + decimals))/(uint256(price));
+        uint256 usdToWei = uint256(10**(18 + decimals)) / (uint256(price));
 
         uint256 _amountInNative = usdPrice * usdToWei;
 
-        return (_amountInNative, timeStamp / 1000);
+        return (_amountInNative, timeStamp);
     }
 }

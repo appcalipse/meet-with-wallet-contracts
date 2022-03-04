@@ -7,6 +7,8 @@ import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "@nomiclabs/hardhat-etherscan";
+import "@ericxstone/hardhat-blockscout-verify";
+import {SOLIDITY_VERSION, EVM_VERSION} from "@ericxstone/hardhat-blockscout-verify";
 
 dotenv.config();
 
@@ -27,11 +29,7 @@ const accounts =  process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_K
 const config: HardhatUserConfig = {
   solidity: "0.8.4",
   networks: {
-    ropsten: {
-      url: process.env.ROPSTEN_URL || "",
-      accounts
-    },
-    harmonyTestnet: {
+    harmonyTest: {
       url: `https://api.s0.b.hmny.io`,
       accounts
     },
@@ -59,6 +57,26 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
   },
+  blockscoutVerify: {
+    blockscoutURL: "https://stardust-explorer.metis.io",
+    contracts: {
+      "MWWRegistarMetis" : {
+        compilerVersion: SOLIDITY_VERSION.SOLIDITY_V_8_4, 
+        optimization: false,
+        evmVersion: EVM_VERSION.EVM_ISTANBUL,
+        optimizationRuns: 0,
+      },
+      "MWWSubscription" : {
+        compilerVersion: SOLIDITY_VERSION.SOLIDITY_V_8_4, 
+        optimization: false,
+        evmVersion: EVM_VERSION.EVM_ISTANBUL,
+        optimizationRuns: 0,
+      }
+    }
+  },
 };
+
+
+
 
 export default config;

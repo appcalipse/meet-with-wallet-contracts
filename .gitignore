@@ -9,3 +9,4 @@ cache
 artifacts
 
 .DS_Store
+yarn-error.log

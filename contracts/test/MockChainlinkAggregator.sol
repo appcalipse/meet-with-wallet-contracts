@@ -31,7 +31,7 @@ contract MockChainlinkAggregator is AggregatorV3Interface {
             uint80 answeredInRound
         )
     {
-        return (1, 220206450, 1537396800000, block.timestamp * 1000, 1);
+        return (1, 220206450, 1537396800000, block.timestamp, 1);
     }
 
     function latestRoundData()
@@ -46,6 +46,6 @@ contract MockChainlinkAggregator is AggregatorV3Interface {
             uint80 answeredInRound
         )
     {
-        return (1, 220206450, 1537396800000, block.timestamp * 1000, 1);
+        return (1, 220206450, 1537396800000, block.timestamp, 1);
     }
 }

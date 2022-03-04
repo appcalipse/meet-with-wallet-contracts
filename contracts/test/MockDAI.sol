@@ -9,6 +9,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract MockDAI is ERC20 {
     // Example class - a mock class using delivering from ERC20
     constructor(address destination) ERC20("Mock DAI", "DAI") {
-        _mint(destination, 100 * 10**(decimals()));
+        _mint(destination, 1000 * 10**(decimals()));
     }
 }

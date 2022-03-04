@@ -5,7 +5,6 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "./MWWRegistarBase.sol";
 
 contract MWWRegistarHarmony is MWWRegistarBase {
-
     AggregatorV3Interface priceFeed;
 
     constructor(address[] memory acceptableTokenAddresses)
@@ -36,6 +35,6 @@ contract MWWRegistarHarmony is MWWRegistarBase {
 
         uint256 _amountInNative = usdPrice * usdToWei;
 
-        return (_amountInNative, timeStamp / 1000);
+        return (_amountInNative, timeStamp);
     }
 }
