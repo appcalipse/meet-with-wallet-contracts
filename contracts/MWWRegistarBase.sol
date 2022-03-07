@@ -4,10 +4,9 @@ pragma solidity >=0.8.4 <0.9.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "./MWWSubscription.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "./MWWDomain.sol";
 
-abstract contract MWWRegistarBase is Ownable, ReentrancyGuard {
+abstract contract MWWRegistarBase is Ownable {
     using SafeERC20 for ERC20;
 
     struct PlanInfo {
@@ -15,15 +14,13 @@ abstract contract MWWRegistarBase is Ownable, ReentrancyGuard {
         uint256 usdPrice;
     }
 
-    MWWSubscription public subscriptionContract;
+    MWWDomain public domainContract;
 
     mapping(address => bool) private acceptableTokens;
     mapping(uint8 => PlanInfo) private availablePlans;
     uint8[] private planIds;
 
     event MWWPurchase(address planOwner, uint256 timestamp);
-
-    receive() external payable {}
 
     constructor(address[] memory _acceptableTokens) {
         for (uint256 i = 0; i < _acceptableTokens.length; i++) {
@@ -35,7 +32,7 @@ abstract contract MWWRegistarBase is Ownable, ReentrancyGuard {
         address tokenAddress,
         uint256 amount,
         address destination
-    ) public onlyOwner nonReentrant {
+    ) public onlyOwner {
         require(amount > 0, "Amount can't be zero");
         require(destination != address(0), "Destination can't be zero");
         require(destination != address(this), "Can't send to this contract");
@@ -49,8 +46,8 @@ abstract contract MWWRegistarBase is Ownable, ReentrancyGuard {
         }
     }
 
-    function setSubscriptionContract(address _address) public onlyOwner {
-        subscriptionContract = MWWSubscription(_address);
+    function setDomainContract(address _address) public onlyOwner {
+        domainContract = MWWDomain(_address);
     }
 
     function addAcceptableToken(address tokenAddress) public onlyOwner {
@@ -86,9 +83,9 @@ abstract contract MWWRegistarBase is Ownable, ReentrancyGuard {
         uint256 duration,
         string memory domain,
         string memory ipfsHash
-    ) public payable returns (MWWStructs.Subscription memory) {
+    ) public payable returns (MWWStructs.Domain memory) {
         require(
-            address(subscriptionContract) != address(0),
+            address(domainContract) != address(0),
             "Subscription contract not set"
         );
         require(availablePlans[planId].usdPrice != 0, "Plan does not exists");
@@ -113,9 +110,9 @@ abstract contract MWWRegistarBase is Ownable, ReentrancyGuard {
         uint256 duration,
         string calldata domain,
         string calldata ipfsHash
-    ) public payable returns (MWWStructs.Subscription memory) {
+    ) public payable returns (MWWStructs.Domain memory) {
         require(
-            address(subscriptionContract) != address(0),
+            address(domainContract) != address(0),
             "Subscription contract not set"
         );
         require(availablePlans[planId].usdPrice != 0, "Plan does not exists");
@@ -138,8 +135,8 @@ abstract contract MWWRegistarBase is Ownable, ReentrancyGuard {
         uint256 duration,
         string memory domain,
         string memory ipfsHash
-    ) private returns (MWWStructs.Subscription memory) {
-        MWWStructs.Subscription memory subs = subscriptionContract.subscribe(
+    ) private returns (MWWStructs.Domain memory) {
+        MWWStructs.Domain memory subs = domainContract.subscribe(
             msg.sender,
             planId,
             planOwner,

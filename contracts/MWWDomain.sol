@@ -4,7 +4,7 @@ pragma solidity >=0.8.4 <0.9.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 library MWWStructs {
-    struct Subscription {
+    struct Domain {
         address owner;
         uint256 planId;
         uint256 expiryTime; //valid until when
@@ -14,9 +14,9 @@ library MWWStructs {
     }
 }
 
-contract MWWSubscription is Ownable {
+contract MWWDomain is Ownable {
     mapping(address => bool) private admins;
-    mapping(string => MWWStructs.Subscription) public subscriptions;
+    mapping(string => MWWStructs.Domain) public domains;
     mapping(address => string[]) private accountDomains;
     mapping(string => address[]) private domainDelegates;
 
@@ -81,12 +81,12 @@ contract MWWSubscription is Ownable {
         view
         returns (bool)
     {
-        return isDelegate(domain) || subscriptions[domain].owner == msg.sender;
+        return isDelegate(domain) || domains[domain].owner == msg.sender;
     }
 
     function addDelegate(string calldata domain, address delegate) public {
         require(
-            subscriptions[domain].owner == msg.sender,
+            domains[domain].owner == msg.sender,
             "You are not allowed to do this"
         );
         domainDelegates[domain].push(delegate);
@@ -94,15 +94,16 @@ contract MWWSubscription is Ownable {
 
     function removeDelegate(string calldata domain, address delegate) public {
         require(
-            subscriptions[domain].owner == msg.sender,
+            domains[domain].owner == msg.sender,
             "You are not allowed to do this"
         );
 
         uint256 j = 0;
+        uint256 size = domainDelegates[domain].length;
         address[] memory auxDelegates = new address[](
-            domainDelegates[domain].length - 1
+            size - 1
         );
-        for (uint256 i = 0; i < domainDelegates[domain].length; i++) {
+        for (uint256 i = 0; i < size; i++) {
             if (domainDelegates[domain][i] != delegate) {
                 auxDelegates[j] = domainDelegates[domain][i];
                 j = j + 1;
@@ -118,7 +119,7 @@ contract MWWSubscription is Ownable {
         uint256 duration,
         string calldata domain,
         string calldata ipfsHash
-    ) public onlyRegisterContract returns (MWWStructs.Subscription memory) {
+    ) public onlyRegisterContract returns (MWWStructs.Domain memory) {
         return
             _subscribe(
                 originalCaller,
@@ -130,22 +131,22 @@ contract MWWSubscription is Ownable {
             );
     }
 
-    function addSubscription(
-        uint256 planId,
-        address planOwner,
-        uint256 duration,
-        string calldata domain,
-        string calldata ipfsHash
-    ) public onlyAdmin returns (MWWStructs.Subscription memory) {
-        return
+    function addDomains(
+        MWWStructs.Domain[] calldata domainsToAdd
+    ) public onlyAdmin returns (bool) {
+            uint256 size = domainsToAdd.length;
+        for (uint256 i = 0; i < size; i++) {
+            MWWStructs.Domain calldata domain = domainsToAdd[i];
             _subscribe(
                 address(0),
-                planId,
-                planOwner,
-                duration,
-                domain,
-                ipfsHash
+                domain.planId,
+                domain.owner,
+                domain.expiryTime - block.timestamp,
+                domain.domain,
+                domain.configIpfsHash
             );
+        }
+        return true;
     }
 
     function _subscribe(
@@ -155,28 +156,28 @@ contract MWWSubscription is Ownable {
         uint256 duration,
         string calldata domain,
         string calldata ipfsHash
-    ) private returns (MWWStructs.Subscription memory) {
+    ) private returns (MWWStructs.Domain memory) {
         if (
-            subscriptions[domain].owner != address(0) &&
-            subscriptions[domain].expiryTime > block.timestamp
+            domains[domain].owner != address(0) &&
+            domains[domain].expiryTime > block.timestamp
         ) {
             // check subscription exists and is not expired
             require(
-                subscriptions[domain].owner == planOwner,
+                domains[domain].owner == planOwner,
                 "Domain registered for someone else"
             );
             require(
-                subscriptions[domain].planId == planId,
+                domains[domain].planId == planId,
                 "Domain registered with another plan"
             );
 
-            MWWStructs.Subscription storage sub = subscriptions[domain];
-            sub.expiryTime = sub.expiryTime + duration;
+            MWWStructs.Domain storage existingDomain = domains[domain];
+            existingDomain.expiryTime = existingDomain.expiryTime + duration;
 
-            return sub;
+            return existingDomain;
         }
 
-        MWWStructs.Subscription memory subscription = MWWStructs.Subscription({
+        MWWStructs.Domain memory _domain = MWWStructs.Domain({
             owner: planOwner,
             planId: planId,
             expiryTime: block.timestamp + duration,
@@ -189,18 +190,18 @@ contract MWWSubscription is Ownable {
             domainDelegates[domain].push(originalCaller);
         }
 
-        subscriptions[domain] = subscription;
+        domains[domain] = _domain;
 
         accountDomains[planOwner].push(domain);
 
         emit MWWSubscribed(planOwner, planId, duration, domain);
 
-        return subscription;
+        return _domain;
     }
 
     function changeDomain(string calldata domain, string calldata newDomain)
         public
-        returns (MWWStructs.Subscription memory)
+        returns (MWWStructs.Domain memory)
     {
         require(
             isAllowedToManageDomain(domain),
@@ -212,9 +213,9 @@ contract MWWSubscription is Ownable {
             "New Domain must be unregistered or expired."
         );
 
-        MWWStructs.Subscription memory subs = subscriptions[domain];
+        MWWStructs.Domain memory subs = domains[domain];
 
-        subscriptions[newDomain] = MWWStructs.Subscription({
+        domains[newDomain] = MWWStructs.Domain({
             owner: subs.owner,
             planId: subs.planId,
             expiryTime: subs.expiryTime,
@@ -223,7 +224,7 @@ contract MWWSubscription is Ownable {
             registeredAt: subs.registeredAt
         });
 
-        delete subscriptions[domain];
+        delete domains[domain];
 
         string[] memory auxDomains = new string[](
             accountDomains[subs.owner].length
@@ -239,7 +240,7 @@ contract MWWSubscription is Ownable {
                 keccak256(bytes(accountDomains[subs.owner][i])) != oldDomainHash
             ) {
                 auxDomains[j] = accountDomains[subs.owner][i];
-                j = j + 1;
+                j++;
             }
         }
 
@@ -247,10 +248,10 @@ contract MWWSubscription is Ownable {
 
         emit MWWDomainChanged(subs.owner, domain, newDomain);
 
-        return subscriptions[newDomain];
+        return domains[newDomain];
     }
 
-    function changeSubscriptionConfigHash(
+    function changeDomainConfigHash(
         string calldata domain,
         string calldata ipfsHash
     ) public {
@@ -258,7 +259,7 @@ contract MWWSubscription is Ownable {
             isAllowedToManageDomain(domain),
             "Only the owner or delegates can manage the domain"
         );
-        subscriptions[domain].configIpfsHash = ipfsHash;
+        domains[domain].configIpfsHash = ipfsHash;
     }
 
     function isSubscriptionActive(string calldata domain)
@@ -266,7 +267,7 @@ contract MWWSubscription is Ownable {
         view
         returns (bool)
     {
-        return subscriptions[domain].expiryTime > block.timestamp;
+        return domains[domain].expiryTime > block.timestamp;
     }
 
     function getDomainsForAccount(address account)

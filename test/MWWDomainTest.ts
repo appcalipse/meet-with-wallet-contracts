@@ -12,14 +12,14 @@ const blockChainDelay = async (delay: number) => {
   await network.provider.send("evm_mine")
 }
 
-describe("MWWSubscription", async () => {
+describe("MWWDomain", async () => {
 
   let instance: Contract;
   let [deployer, registrar, user, newAdmin, randomUser]: SignerWithAddress[] = [];
 
   beforeEach('should setup the contract instance', async () => {
     [deployer, registrar, user, newAdmin, randomUser] = await ethers.getSigners();
-    instance = await (await ethers.getContractFactory("MWWSubscription")).deploy(registrar.address)
+    instance = await (await ethers.getContractFactory("MWWDomain")).deploy(registrar.address)
   });
 
   it("should have first account as owner", async () => {
@@ -42,23 +42,30 @@ describe("MWWSubscription", async () => {
     expect(newOwner).to.equal(newAdmin.address)
   });
 
-  it("admin can manually add subscription", async () => {
+  it("admin can manually add subscriptions", async () => {
+
+    const expirTime = new Date().getTime() + 500
     await instance.addAdmin(newAdmin.address)
-    await instance.connect(newAdmin).addSubscription(0, user.address , 100, "mww.eth", "")
+    await instance.connect(newAdmin).addDomains([[user.address, 1, expirTime, "mww.eth", "", 0]])
     const active = await instance.isSubscriptionActive("mww.eth")
     expect(active).to.equal(true)
+    await instance.connect(newAdmin).addDomains([[user.address, 1, expirTime, "mww2.eth", "", 0], [user.address, 1, expirTime, "mww3.eth", "", 0]])
+    const active2 = await instance.isSubscriptionActive("mww2.eth")
+    expect(active2).to.equal(true)
+    const active3 = await instance.isSubscriptionActive("mww3.eth")
+    expect(active3).to.equal(true)
   });
 
   it("removing admin should then fail to manually add subscription", async () => {
     await instance.addAdmin(newAdmin.address)
     await instance.removeAdmin(newAdmin.address)
-    await expect(instance.connect(user).addSubscription(0, user.address , 100, "mww.eth", "")).to.be.revertedWith("Only admin can do it")
+    await expect(instance.connect(user).addDomains([[user.address,1,  100, "mww.eth", "", 0]])).to.be.revertedWith("Only admin can do it")
   });
 
   it("should create subscription", async () => {
     await instance.connect(registrar).subscribe(randomUser.address, 1, user.address , 100, "mww.eth", "")
 
-    const sub = await instance.subscriptions("mww.eth")
+    const sub = await instance.domains("mww.eth")
     expect(sub.domain).to.equal("mww.eth")
     expect(sub.planId).to.equal(1)
     expect(sub.owner).to.equal(user.address)
@@ -74,7 +81,7 @@ describe("MWWSubscription", async () => {
 
   it("should fail to subscribe", async () => {
     await expect(instance.connect(user).subscribe(randomUser.address, 1, user.address , 100, "mww.eth", "")).to.be.revertedWith("Only the register can call this")
-    await expect(instance.connect(user).addSubscription(0, user.address , 100, "mww.eth", "")).to.be.revertedWith("Only admin can do it")
+    await expect(instance.connect(user).addDomains([[user.address, 1, 100, "mww.eth", "", 0]])).to.be.revertedWith("Only admin can do it")
   });
 
   it("subscription should expire", async () => {
@@ -95,9 +102,9 @@ describe("MWWSubscription", async () => {
 
   it("Should extend subscription", async () => {
     await instance.connect(registrar).subscribe(randomUser.address, 1, user.address, 300, "mww.eth", "")
-    const sub = await instance.subscriptions("mww.eth")
+    const sub = await instance.domains("mww.eth")
     await instance.connect(registrar).subscribe(randomUser.address, 1, user.address, 300, "mww.eth", "")
-    const updatedSub = await instance.subscriptions("mww.eth")
+    const updatedSub = await instance.domains("mww.eth")
     const domains = await instance.getDomainsForAccount(user.address)
     expect(BigNumber.from(sub.expiryTime).add(300)).to.equal(BigNumber.from(updatedSub.expiryTime))
     expect(domains).to.have.lengthOf(1)  
@@ -115,9 +122,9 @@ describe("MWWSubscription", async () => {
 
   it("should be able to change domain on subscription", async () => {
     await instance.connect(registrar).subscribe(randomUser.address, 1, user.address, 100, "mww.eth", "")
-    const sub = await instance.subscriptions("mww.eth")
+    const sub = await instance.domains("mww.eth")
     await instance.connect(user).changeDomain("mww.eth","mww2.eth")
-    const changedSub = await instance.subscriptions("mww2.eth")
+    const changedSub = await instance.domains("mww2.eth")
     expect(sub.expiryTime).to.equal(changedSub.expiryTime)
   
     const domains = await instance.getDomainsForAccount(user.address)
@@ -189,28 +196,28 @@ describe("MWWSubscription", async () => {
 
   it("should change ipfs hash", async () => {
     await instance.connect(registrar).subscribe(randomUser.address, 1, user.address, 100, "mww.eth", "hash1")
-    const sub = await instance.subscriptions("mww.eth")
+    const sub = await instance.domains("mww.eth")
     expect(sub.configIpfsHash).to.equal("hash1")
-    await instance.connect(user).changeSubscriptionConfigHash("mww.eth","hash2")
-    const changedSub = await instance.subscriptions("mww.eth")
+    await instance.connect(user).changeDomainConfigHash("mww.eth","hash2")
+    const changedSub = await instance.domains("mww.eth")
     expect(changedSub.configIpfsHash).to.equal("hash2")
   });
 
   it("should change ipfs hash as delegate", async () => {
     await instance.connect(registrar).subscribe(randomUser.address, 1, user.address, 100, "mww.eth", "hash1")
     await instance.connect(user).addDelegate("mww.eth", newAdmin.address)
-    const sub = await instance.subscriptions("mww.eth")
+    const sub = await instance.domains("mww.eth")
     expect(sub.configIpfsHash).to.equal("hash1")
-    await instance.connect(newAdmin).changeSubscriptionConfigHash("mww.eth","hash2")
-    const changedSub = await instance.subscriptions("mww.eth")
+    await instance.connect(newAdmin).changeDomainConfigHash("mww.eth","hash2")
+    const changedSub = await instance.domains("mww.eth")
     expect(changedSub.configIpfsHash).to.equal("hash2")
   });
 
   it("should fail to change ipfs hash", async () => {
     await instance.connect(registrar).subscribe(randomUser.address, 1, user.address, 100, "mww.eth", "hash1")
-    const sub = await instance.subscriptions("mww.eth")
+    const sub = await instance.domains("mww.eth")
     expect(sub.configIpfsHash).to.equal("hash1")
-    await (expect(instance.connect(newAdmin).changeSubscriptionConfigHash("mww.eth","hash2")).to.be.revertedWith("Only the owner or delegates can manage the domain"))
+    await (expect(instance.connect(newAdmin).changeDomainConfigHash("mww.eth","hash2")).to.be.revertedWith("Only the owner or delegates can manage the domain"))
   });
 
 });

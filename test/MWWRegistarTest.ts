@@ -13,7 +13,7 @@ const YEAR_IN_SECONDS = 31_540_000
 describe("MWWRegistar", async () => {
 
   let instance: Contract;
-  let subscriptionContract: Contract;
+  let domainContract: Contract;
   let [deployer, registrar, user, newAdmin]: SignerWithAddress[] = [];
   let usdc: ERC20
   let dai: ERC20
@@ -25,8 +25,8 @@ describe("MWWRegistar", async () => {
     const priceFeed = await (await ethers.getContractFactory("MockChainlinkAggregator")).deploy()
     instance = await (await ethers.getContractFactory("MWWRegistarPolygon")).deploy([usdc.address])
     await instance.setPriceFeed(priceFeed.address)
-    subscriptionContract = await (await ethers.getContractFactory("MWWSubscription")).deploy(instance.address)
-    await instance.setSubscriptionContract(subscriptionContract.address)
+    domainContract = await (await ethers.getContractFactory("MWWDomain")).deploy(instance.address)
+    await instance.setDomainContract(domainContract.address)
   });
 
   it("should add plans", async () => {
@@ -71,7 +71,7 @@ describe("MWWRegistar", async () => {
     expect(newContractBalance).to.eq(contractBalance.add(planPriceInWei))
     expect(newNewAdminBalance).to.lt(newAdminBalance.sub(planPriceInWei)) //gas fees
     expect(newUserBalance).to.eq(userBalance)
-    const domains = await subscriptionContract.getDomainsForAccount(user.address)
+    const domains = await domainContract.getDomainsForAccount(user.address)
     expect(domains).to.include.ordered.members(["look at me"]) 
   });
 
@@ -79,7 +79,7 @@ describe("MWWRegistar", async () => {
     await instance.addPlan("PRO", 30, 1)
     const [planPriceInWei,] = (await instance.getNativeConvertedValue(30))
     await instance.connect(newAdmin).purchaseWithNative(1, user.address, YEAR_IN_SECONDS, "mww.eth", "hash", {value: planPriceInWei})
-    const delegates = await subscriptionContract.getDelegatesForDomain("mww.eth")
+    const delegates = await domainContract.getDelegatesForDomain("mww.eth")
     expect(delegates).to.include.ordered.members([newAdmin.address])
   });
 
@@ -102,7 +102,7 @@ describe("MWWRegistar", async () => {
 
   it("should fail to purchase without approving token", async () => {
     await instance.addPlan("PRO", 30, 1)
-    await expect(instance.purchaseWithToken(usdc.address, 1, user.address, YEAR_IN_SECONDS, "look at me", "hash")).to.be.revertedWith("ERC20: transfer amount exceeds balance")
+    await expect(instance.purchaseWithToken(usdc.address, 1, user.address, YEAR_IN_SECONDS, "look at me", "hash")).to.be.revertedWith("ERC20: insufficient allowance")
   });
 
   it("should purchase with USDC", async () => {
@@ -119,7 +119,7 @@ describe("MWWRegistar", async () => {
     expect(newContractBalance).to.eq(contractBalance.add(30*10**6))
     expect(newUserBalance).to.eq(userBalance)
     expect(newNewAdminBalance).to.eq(newAdminBalance.sub(30*10**6))
-    const domains = await subscriptionContract.getDomainsForAccount(user.address)
+    const domains = await domainContract.getDomainsForAccount(user.address)
     expect(domains).to.include.ordered.members(["look at me"]) 
   });
 
@@ -131,7 +131,7 @@ describe("MWWRegistar", async () => {
     const userBalance = await usdc.balanceOf(user.address)
     expect(userBalance).to.eq(40*10**6)
 
-    const sub = await subscriptionContract.subscriptions("look at me")
+    const sub = await domainContract.domains("look at me")
     expect(sub.expiryTime).to.equal(Number(sub.registeredAt) + 2*YEAR_IN_SECONDS)
     
     await instance.connect(user).purchaseWithToken(usdc.address, 1, user.address, Math.round(YEAR_IN_SECONDS/3), "look at me2", "hash")
@@ -161,8 +161,8 @@ describe("MWWRegistar", async () => {
     const priceFeed = await (await ethers.getContractFactory("MockDIAOracleOutdated")).deploy()
     instance = await (await ethers.getContractFactory("MWWRegistarMetis")).deploy([usdc.address])
     await instance.setPriceFeed(priceFeed.address)
-    subscriptionContract = await (await ethers.getContractFactory("MWWSubscription")).deploy(instance.address)
-    await instance.setSubscriptionContract(subscriptionContract.address)
+    domainContract = await (await ethers.getContractFactory("MWWDomain")).deploy(instance.address)
+    await instance.setDomainContract(domainContract.address)
     await instance.addPlan("PRO", 30, 1)
     const [planPriceInWei,] = (await instance.getNativeConvertedValue(30))
     await expect(instance.connect(newAdmin).purchaseWithNative(1, user.address, YEAR_IN_SECONDS, "look at me", "hash", {value: planPriceInWei})).to.be.revertedWith("Price is outdated")

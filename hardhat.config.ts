@@ -66,7 +66,7 @@ const config: HardhatUserConfig = {
         evmVersion: EVM_VERSION.EVM_ISTANBUL,
         optimizationRuns: 0,
       },
-      "MWWSubscription" : {
+      "MWWDomain" : {
         compilerVersion: SOLIDITY_VERSION.SOLIDITY_V_8_4, 
         optimization: false,
         evmVersion: EVM_VERSION.EVM_ISTANBUL,
