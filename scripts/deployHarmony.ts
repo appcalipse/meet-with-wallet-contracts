@@ -23,6 +23,7 @@ async function main() {
   const registar = await Registar.deploy([USDC, DAI])
   await registar.deployed()
   await registar.setPriceFeed(PRICE_FEED)
+  await registar.addPlan('PRO', 30, 1)
 
   const Subscripton = await ethers.getContractFactory("MWWDomain")
   const domainContract = await Subscripton.deploy(registar.address)
@@ -30,7 +31,7 @@ async function main() {
   await registar.setDomainContract(domainContract.address)
 
   console.log("Registar deployed to:", registar.address);
-  console.log("Subscription deployed to:", domainContract.address);
+  console.log("Domain deployed to:", domainContract.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

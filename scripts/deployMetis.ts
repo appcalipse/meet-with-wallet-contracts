@@ -5,7 +5,8 @@
 // Runtime Environment's members available in the global scope.
 import { ethers } from "hardhat";
 
-const PRICE_FEED = "0xcEe686F89bc0dABAd95AEAAC980aE1d97A075FAD" //https://docs.chain.link/docs/harmony-price-feeds/
+const USDC = "0xea32a96608495e54156ae48931a7c20f0dcc1a21" //https://andromeda-explorer.metis.io/token/0xEA32A96608495e54156Ae48931A7c20f0dcc1a21/ 
+const PRICE_FEED = "0x6E6E633320Ca9f2c8a8722c5f4a993D9a093462E" //https://andromeda-explorer.metis.io/address/0x6E6E633320Ca9f2c8a8722c5f4a993D9a093462E/
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -17,22 +18,17 @@ async function main() {
 
   // We get the contract to deploy
 
-  const [deployer] = await ethers.getSigners();
-
-  const mockDAI = await (await ethers.getContractFactory("MockDAI")).deploy(deployer.address)
-
-  const Registar = await ethers.getContractFactory("MWWRegistarHarmony")
-  const registar = await Registar.deploy([mockDAI.address])
+  const Registar = await ethers.getContractFactory("MWWRegistarMetis")
+  const registar = await Registar.deploy([USDC])
   await registar.deployed()
   await registar.setPriceFeed(PRICE_FEED)
-  await registar.addPlan('PRO', 1, 1)
+  await registar.addPlan('PRO', 30, 1)
 
   const Subscripton = await ethers.getContractFactory("MWWDomain")
   const domainContract = await Subscripton.deploy(registar.address)
   await domainContract.deployed()
   await registar.setDomainContract(domainContract.address)
 
-  console.log("mockDAI deployed to:", mockDAI.address);
   console.log("Registar deployed to:", registar.address);
   console.log("Domain deployed to:", domainContract.address);
 }

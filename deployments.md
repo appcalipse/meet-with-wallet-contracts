@@ -2,18 +2,33 @@
 
 # Harmony testnet
 
-mockDAI deployed to: 0xECfd0052945e235a1E4aE78C02F05F802282cb74
-Registar deployed to: 0xC120601404c894a89CF0D08D52e3E1fc7943bA1c
-Subscription deployed to: 0x0B63ea2262CD64fE3A032Fc220b5352Ff98c7EA3
+mockDAI deployed to: 0x0C1d5a01ab6a8D3CAe7C03feF6cAF513E5A98E00
+Registar deployed to: 0xC1A78C9ce8FC447030eDff6728822cfd6fFc1948
+Domain deployed to: 0xa1C624685b0B5AF16be093bbc00ad525Be3f046B
 
 # Polygon Mumbai
 
-mockDAI deployed to: 0xcb7f6C752e00da963038f1BaE79aafBCa8473a36
-Registar deployed to: 0x98FAb7cD7d3095b65B54115697CA998012bea037
-Subscription deployed to: 0x25D64EA72Cd90eDE499639E32040e10e70B0d45d
+mockDAI deployed to: 0x9Cb38ff196107750Fe05FDE9a5c449319DD9f848
+Registar deployed to: 0xDD853a88ACbD365085D17448a97DD6123fE91b4A
+Domain deployed to: 0x87cEbF6684488998bd48C07E0691D31b64D30e2A
 
 # Metis Stardust
 
-mockDAI deployed to: 0xD3F1eE2b69ffCF8AcD20ef79Fd6697Ceb99Ae024
-Registar deployed to: 0xF134578d326479FD3aA7c9f861AA8F84FD1f4A82
-Subscription deployed to: 0xd05d8e0Bf27951b649914A00EF9C9E8bEE8766b8
+mockDAI deployed to: 0xFf8d4104D0bcE4ad3480326Ea8202514CBF09B6C
+Registar deployed to: 0x13B5065B2586f0D457641b4C4FA09C2550843F42
+Domain deployed to: 0xECfd0052945e235a1E4aE78C02F05F802282cb74
+
+# Harmony Mainnet
+
+Registar deployed to: 0x1DF8FcA6035342eeD37c3C10dcD4cC1B4030628D
+Domain deployed to: 0x45eB1cFf81A01DdC89eE2C4ad122fFB260e0C5e1
+
+# Polygon Matic
+
+Registar deployed to: 0xf652014545758Bae52A019CAf671a29A6B117759
+Domain deployed to: 0xB054ef071881a35a276dc434D95BF087a957736b
+
+# Metis Andromeda
+
+Registar deployed to: 0x13B5065B2586f0D457641b4C4FA09C2550843F42
+Domain deployed to: 0xECfd0052945e235a1E4aE78C02F05F802282cb74

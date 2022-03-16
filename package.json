@@ -4,7 +4,7 @@
     "test": "hardhat test",
     "deploy": "hardhat run --network",
     "verify:registar": "hardhat verify --constructor-args scripts/argumentsRegistar.js --network",
-    "verify:subscription": "hardhat verify --constructor-args scripts/argumentsSubscription.js --network",
+    "verify:domain": "hardhat verify --constructor-args scripts/argumentsDomain.js --network",
     "blockscout:verify": "hardhat blockscout-verify",
     "lint": "solhint 'contracts/**/*.sol'",
     "prettier": "prettier --write 'contracts/**/*.sol'"

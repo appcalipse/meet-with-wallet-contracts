@@ -5,8 +5,8 @@
 // Runtime Environment's members available in the global scope.
 import { ethers } from "hardhat";
 
-const USDC = "" 
-const DAI = "" 
+const USDC = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174" //https://polygonscan.com/token/0x2791bca1f2de4661ed88a30c99a7a9449aa84174 
+const DAI = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063" //https://polygonscan.com/token/0x8f3cf7ad23cd3cadbd9735aff958023239c6a063
 const PRICE_FEED = "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0" //https://docs.chain.link/docs/matic-addresses/
 
 async function main() {
@@ -23,6 +23,7 @@ async function main() {
   const registar = await Registar.deploy([USDC, DAI])
   await registar.deployed()
   await registar.setPriceFeed(PRICE_FEED)
+  await registar.addPlan('PRO', 30, 1)
 
   const Subscripton = await ethers.getContractFactory("MWWDomain")
   const domainContract = await Subscripton.deploy(registar.address)
@@ -30,7 +31,7 @@ async function main() {
   await registar.setDomainContract(domainContract.address)
 
   console.log("Registar deployed to:", registar.address);
-  console.log("Subscription deployed to:", domainContract.address);
+  console.log("Domain deployed to:", domainContract.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

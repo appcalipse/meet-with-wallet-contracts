@@ -34,15 +34,20 @@ const config: HardhatUserConfig = {
       accounts
     },
     harmonyMainnet: {
-      url: `https://api.harmony.one`,
-      accounts
+      url: `https://api.s0.t.hmny.io`,
+      accounts,
+      gasPrice: 2250000000000,
     },
     metisStardust: {
       url: `https://stardust.metis.io/?owner=588`,
       accounts
     },
+    metis: {
+      url: `https://andromeda.metis.io/?owner=1088`,
+      accounts
+    },
     polygonMumbai: {
-      url: `https://rpc-mumbai.matic.today`,
+      url: `https://matic-mumbai.chainstacklabs.com`,
       accounts
     },
     matic: {

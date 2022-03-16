@@ -34,7 +34,7 @@ async function main() {
 
   console.log("mockDAI deployed to:", mockDAI.address);
   console.log("Registar deployed to:", registar.address);
-  console.log("Subscription deployed to:", domainContract.address);
+  console.log("Domain deployed to:", domainContract.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
