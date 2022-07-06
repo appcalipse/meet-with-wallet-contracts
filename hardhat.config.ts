@@ -7,8 +7,6 @@ import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "@nomiclabs/hardhat-etherscan";
-import "@ericxstone/hardhat-blockscout-verify";
-import {SOLIDITY_VERSION, EVM_VERSION} from "@ericxstone/hardhat-blockscout-verify";
 
 dotenv.config();
 
@@ -42,7 +40,7 @@ const config: HardhatUserConfig = {
       url: `https://stardust.metis.io/?owner=588`,
       accounts
     },
-    metis: {
+    metisAndromeda: {
       url: `https://andromeda.metis.io/?owner=1088`,
       accounts
     },
@@ -53,7 +51,7 @@ const config: HardhatUserConfig = {
     matic: {
       url: `https://polygon-rpc.com`,
       accounts
-    }
+    },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
@@ -61,27 +59,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
-  },
-  blockscoutVerify: {
-    blockscoutURL: "https://stardust-explorer.metis.io",
-    contracts: {
-      "MWWRegistarMetis" : {
-        compilerVersion: SOLIDITY_VERSION.SOLIDITY_V_8_4, 
-        optimization: false,
-        evmVersion: EVM_VERSION.EVM_ISTANBUL,
-        optimizationRuns: 0,
-      },
-      "MWWDomain" : {
-        compilerVersion: SOLIDITY_VERSION.SOLIDITY_V_8_4, 
-        optimization: false,
-        evmVersion: EVM_VERSION.EVM_ISTANBUL,
-        optimizationRuns: 0,
-      }
-    }
-  },
+  }
 };
-
-
-
 
 export default config;
