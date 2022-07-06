@@ -27,6 +27,14 @@ const accounts =  process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_K
 const config: HardhatUserConfig = {
   solidity: "0.8.4",
   networks: {
+    ethereum: {
+      url: `https://eth-mainnet.nodereal.io/v1/1659dfb40aa24bbb8153a677b98064d7`,
+      accounts
+    },
+    rinkeby: {
+      url: `https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161`,
+      accounts
+    },
     harmonyTest: {
       url: `https://api.s0.b.hmny.io`,
       accounts
