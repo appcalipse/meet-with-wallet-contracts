@@ -16,11 +16,6 @@ jobs:
         uses: ./.github/actions/setup
       - run: yarn run lint:ci
         continue-on-error: true
-      - name: Annotate Code Linting Results
-        uses: ataylorme/eslint-annotate-action@v2
-        with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          report-json: "solhint.json"
       - name: Upload SolHint report
         uses: actions/upload-artifact@v2
         with:
@@ -78,15 +73,6 @@ jobs:
       - run: yarn run coverage
         env:
           NODE_OPTIONS: --max_old_space_size=4096
-      - name: Coverage monitor
-        uses: slavcodev/coverage-monitor-action@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          coverage_path: "coverage.json"
-          threshold_alert: 10
-          threshold_warning: 50
-          threshold_metric: "lines"
-          coverage_format: "json-summary"
       - name: Upload Coverage report
         uses: actions/upload-artifact@v2
         with:
