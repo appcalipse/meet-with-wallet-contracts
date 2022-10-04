@@ -1,0 +1,101 @@
+name: CI
+on: [push, pull_request]
+
+env:
+  CI: true
+
+jobs:
+  ########
+  # LINT #
+  ########
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up environment
+        uses: ./.github/actions/setup
+      - run: yarn run lint:ci
+        continue-on-error: true
+      - name: Annotate Code Linting Results
+        uses: ataylorme/eslint-annotate-action@v2
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          report-json: "solhint.json"
+      - name: Upload SolHint report
+        uses: actions/upload-artifact@v2
+        with:
+          name: solhint.json
+          path: solhint.json
+
+  #########
+  # TESTS #
+  #########
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Environment
+        uses: ./.github/actions/setup
+      - name: Run Tests
+        run: yarn run test:gas
+     
+
+  ###########
+  # SCRIPTS #
+  ###########
+  # scripts:
+  #   runs-on: ubuntu-latest
+
+  #   strategy:
+  #      matrix:
+  #        node-version: [16.x, 18.x]
+
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Install packages - Node ${{ matrix.node-version }}
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: ${{ matrix.node-version }}
+  #         cache: 'yarn'
+  #     - run: yarn --ignore-scripts
+  #       shell: bash
+  #     # - name: Create local node and deploy
+  #     #   run: |
+  #     #     yarn hardhat node &
+  #     #     yarn hardhat run scripts/deploy.ts --network localhost
+  #     - name: Run Tests
+  #       run: yarn run test:gas
+
+  ############
+  # COVERAGE #
+  ############
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up environment
+        uses: ./.github/actions/setup
+      - run: yarn run test:coverage
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
+      - uses: codecov/codecov-action@v3
+
+  ###########
+  # SLITHER #
+  ###########
+  slither:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up environment
+        uses: ./.github/actions/setup
+      - uses: crytic/slither-action@v0.1.1
+        id: slither
+        with:
+          sarif: results.sarif
+          fail-on: none
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ steps.slither.outputs.sarif }}

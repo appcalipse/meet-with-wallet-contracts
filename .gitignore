@@ -12,3 +12,4 @@ artifacts
 .DS_Store
 yarn-error.log
 gasReporterOutput.json
+solhint.json
