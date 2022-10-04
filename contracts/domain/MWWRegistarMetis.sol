@@ -4,6 +4,8 @@ pragma solidity >=0.8.4 <0.9.0;
 import "./helper/DIAOracleV2Interface.sol";
 import "./MWWRegistarBase.sol";
 
+/// @notice Main contract operations for Metis network
+/// @author 9tails.eth
 contract MWWRegistarMetis is MWWRegistarBase {
     DIAOracleV2Interface public oracle;
 

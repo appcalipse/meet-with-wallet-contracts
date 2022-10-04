@@ -4,6 +4,8 @@ pragma solidity >=0.8.4 <0.9.0;
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "./MWWRegistarBase.sol";
 
+/// @notice Main contract operations for Polygon network
+/// @author 9tails.eth
 contract MWWRegistarPolygon is MWWRegistarBase {
     AggregatorV3Interface public priceFeed;
 
