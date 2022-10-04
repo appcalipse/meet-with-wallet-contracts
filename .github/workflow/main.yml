@@ -1,20 +1,25 @@
 name: CI
 on:
   push:
-    branches: [main, ci]
+    branches: ["main", "ci"]
   pull_request:
-    branches: [main, ci]
+    branches: ["main, "ci"]
 
 jobs:
   tests:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+
     steps:
       - uses: actions/checkout@v3
-      - name: Install packages
+      - name: Install packages - Node ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
       - run: yarn --ignore-scripts
         shell: bash
       # - name: Create local node and deploy
@@ -22,4 +27,4 @@ jobs:
       #     yarn hardhat node &
       #     yarn hardhat run scripts/deploy.ts --network localhost
       - name: Run Tests
-        run: yarn hardhat test
+        run: yarn run test
