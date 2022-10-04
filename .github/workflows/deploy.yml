@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
        matrix:
-         network: [Ethereum]
+         network: [Custom, Ethereum, Harmony, Matic, Metis, Mumbai, Rinkeby, Stardust]
     steps:
       - uses: actions/checkout@v3
       - name: Set up environment
