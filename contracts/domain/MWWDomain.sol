@@ -63,7 +63,7 @@ contract MWWDomain is Ownable {
     // Public Functions //
     //////////////////////
 
-    /// @notice set the chain address to be used on access control to make sure correct usage
+    /// @notice set the controller contract address that should be checked as caller
     /// @param _address the registar address
     function setRegisterContract(address _address) public onlyOwner {
         registerContract = _address;
