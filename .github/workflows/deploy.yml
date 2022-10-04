@@ -1,0 +1,21 @@
+name: Deploy Checks
+on: [pull_request]
+
+env:
+  CI: true
+
+jobs:
+  deploy-test:
+    runs-on: ubuntu-latest
+    strategy:
+       matrix:
+         network: [Ethereum]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up environment
+        uses: ./.github/actions/setup
+      - name: Start local server
+        continue-on-error: false
+        run: |
+          npx hardhat node &
+          npx hardhat run --network localhost scripts/deploy${{ matrix.network }}.ts
