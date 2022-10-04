@@ -26,4 +26,4 @@ jobs:
       #     yarn hardhat node &
       #     yarn hardhat run scripts/deploy.ts --network localhost
       - name: Run Tests
-        run: yarn run test
+        run: yarn run test:gas
