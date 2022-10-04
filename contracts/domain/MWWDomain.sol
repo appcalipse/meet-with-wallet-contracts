@@ -14,6 +14,8 @@ library MWWStructs {
     }
 }
 
+/// @notice The main Meet With Wallet contract that handles the domain registration
+/// @author 9tails.eth
 contract MWWDomain is Ownable {
     mapping(address => bool) private admins;
     mapping(string => MWWStructs.Domain) public domains;
@@ -39,6 +41,11 @@ contract MWWDomain is Ownable {
         registerContract = _registar;
     }
 
+    ////////////////
+    // Structures //
+    ////////////////
+
+    /// @notice restrict execution for authorized admins only
     modifier onlyAdmin() {
         require(admins[msg.sender], "Only admin can do it");
         _;
@@ -52,14 +59,24 @@ contract MWWDomain is Ownable {
         _;
     }
 
+    //////////////////////
+    // Public Functions //
+    //////////////////////
+
+    /// @notice Create OR update a boss, only the contract owner can perform this action.
+    /// @param _address the registar address
     function setRegisterContract(address _address) public onlyOwner {
         registerContract = _address;
     }
 
+    /// @notice removes admin status from a specific address
+    /// @param admin the address to remove as admin
     function removeAdmin(address admin) public onlyOwner {
         admins[admin] = false;
     }
 
+    /// @notice adds admin status from a specific address
+    /// @param admin the address to add as admin
     function addAdmin(address admin) public onlyAdmin {
         admins[admin] = true;
     }
