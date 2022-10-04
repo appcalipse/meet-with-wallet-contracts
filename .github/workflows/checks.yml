@@ -86,7 +86,7 @@ jobs:
           threshold_alert: 10
           threshold_warning: 50
           threshold_metric: "lines"
-          coverage_format: "json"
+          coverage_format: "json-summary"
       - name: Upload Coverage report
         uses: actions/upload-artifact@v2
         with:
