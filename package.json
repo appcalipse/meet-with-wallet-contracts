@@ -1,6 +1,8 @@
 {
   "name": "meet-with-wallet-contracts",
   "scripts": {
+    "coverage": "env COVERAGE=true hardhat coverage",
+    "clean": "hardhat clean",
     "test": "hardhat test",
     "test:gas": "REPORT_GAS=true npm run test",
     "deploy": "hardhat run --network",
@@ -8,10 +10,22 @@
     "verify:domain": "hardhat verify --constructor-args scripts/argumentsDomain.js --network",
     "blockscout:verify": "hardhat blockscout-verify",
     "lint": "solhint 'contracts/**/*.sol'",
+    "lint:ci": "solhint -f json 'contracts/**/*.sol' > solhint.json",
     "prettier": "prettier --write 'contracts/**/*.sol'",
     "postinstall": "patch-package",
-    "docs": "solidity-docgen --solc-module solc-0.8"
+    "docs": "solidity-docgen --solc-module solc-0.8",
+    "slither": "yarn run clean && slither . --detect reentrancy-eth,reentrancy-no-eth,reentrancy-unlimited-gas"
   },
+  "homepage": "https://meetwithwallet.xyz",
+  "keywords": [
+    "solidity",
+    "ethereum",
+    "smart",
+    "contracts",
+    "security",
+    "meet-with-wallet",
+    "mww"
+  ],
   "devDependencies": {
     "solc-0.8": "npm:solc@0.8.16",
     "solidity-docgen": "0.5.17",
