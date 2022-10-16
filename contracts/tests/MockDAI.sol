@@ -6,13 +6,9 @@
 pragma solidity >=0.8.4 <0.9.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract MockUSDC is ERC20 {
+contract MockDAI is ERC20 {
     // Example class - a mock class using delivering from ERC20
-    constructor(address destination) ERC20("Mock USDC", "USDC") {
-        _mint(destination, 100 * 10**(decimals()));
-    }
-
-    function decimals() public pure override returns (uint8) {
-        return 6;
+    constructor(address destination) ERC20("Mock DAI", "DAI") {
+        _mint(destination, 100000000 * 10**(decimals()));
     }
 }

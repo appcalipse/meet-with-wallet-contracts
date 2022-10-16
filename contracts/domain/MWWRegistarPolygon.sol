@@ -3,6 +3,7 @@ pragma solidity >=0.8.4 <0.9.0;
 
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "./MWWRegistarBase.sol";
+import "../prices/NativePriceLibrary.sol";
 
 /// @notice Main contract operations for Polygon network
 /// @author 9tails.eth
@@ -23,20 +24,6 @@ contract MWWRegistarPolygon is MWWRegistarBase {
         override
         returns (uint256 amountInNative, uint256 timestamp)
     {
-        (
-            uint80 roundID,
-            int256 price,
-            uint256 startedAt,
-            uint256 timeStamp,
-            uint80 answeredInRound
-        ) = priceFeed.latestRoundData();
-
-        uint8 decimals = priceFeed.decimals();
-
-        uint256 usdToWei = uint256(10**(18 + decimals)) / (uint256(price));
-
-        uint256 _amountInNative = usdPrice * usdToWei;
-
-        return (_amountInNative, timeStamp);
+        return NativePriceLibrary.convertUsdToPolygon(priceFeed, usdPrice);
     }
 }

@@ -2,16 +2,16 @@
 pragma solidity >=0.8.4 <0.9.0;
 
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import "./MWWRegistarBase.sol";
+import "./AbstractPaidMeeting.sol";
 import "../prices/NativePriceLibrary.sol";
 
-/// @notice Main contract operations for Harmony network
-/// @author 9tails.eth
-contract MWWRegistarHarmony is MWWRegistarBase {
-    AggregatorV3Interface priceFeed;
+/// @notice Paid Meeting contract implementation specific for Ethereum network
+/// @author falleco.eth
+contract EthereumPaidMeeting is AbstractPaidMeeting {
+    AggregatorV3Interface public priceFeed;
 
-    constructor(address[] memory acceptableTokenAddresses)
-        MWWRegistarBase(acceptableTokenAddresses)
+    constructor(address acceptableTokenAddresses)
+        AbstractPaidMeeting(acceptableTokenAddresses)
     {}
 
     function setPriceFeed(address _priceFeedAddress) public onlyOwner {
@@ -24,6 +24,6 @@ contract MWWRegistarHarmony is MWWRegistarBase {
         override
         returns (uint256 amountInNative, uint256 timestamp)
     {
-        return NativePriceLibrary.convertUsdToHarmony(priceFeed, usdPrice);
+        return NativePriceLibrary.convertUsdToEthereum(priceFeed, usdPrice);
     }
 }

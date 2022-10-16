@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.4 <0.9.0;
 
-import "../helper/DIAOracleV2Interface.sol";
+import "../prices/DIAOracleV2Interface.sol";
 
 contract MockDIAOracleOutdated is DIAOracleV2Interface {
     function getValue(string memory key)
