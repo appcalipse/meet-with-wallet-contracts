@@ -117,9 +117,7 @@ contract MWWDomain is Ownable {
 
         uint256 j = 0;
         uint256 size = domainDelegates[domain].length;
-        address[] memory auxDelegates = new address[](
-            size - 1
-        );
+        address[] memory auxDelegates = new address[](size - 1);
         for (uint256 i = 0; i < size; i++) {
             if (domainDelegates[domain][i] != delegate) {
                 auxDelegates[j] = domainDelegates[domain][i];
@@ -148,10 +146,12 @@ contract MWWDomain is Ownable {
             );
     }
 
-    function addDomains(
-        MWWStructs.Domain[] calldata domainsToAdd
-    ) public onlyAdmin returns (bool) {
-            uint256 size = domainsToAdd.length;
+    function addDomains(MWWStructs.Domain[] calldata domainsToAdd)
+        public
+        onlyAdmin
+        returns (bool)
+    {
+        uint256 size = domainsToAdd.length;
         for (uint256 i = 0; i < size; i++) {
             MWWStructs.Domain calldata domain = domainsToAdd[i];
             _subscribe(

@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.4 <0.9.0;
 
-import "./MWWRegistarBase.sol";
+import "./AbstractPaidMeeting.sol";
 import "../prices/NativePriceLibrary.sol";
 import "../prices/NativePriceLibrary.sol";
 
 /// @notice Main contract operations for Metis network
 /// @author 9tails.eth
-contract MWWRegistarMetis is MWWRegistarBase {
+contract MetisPaidMeeting is AbstractPaidMeeting {
     DIAOracleV2Interface public oracle;
 
-    constructor(address[] memory acceptableTokenAddresses)
-        MWWRegistarBase(acceptableTokenAddresses)
+    constructor(address acceptableTokenAddresses)
+        AbstractPaidMeeting(acceptableTokenAddresses)
     {}
 
-    function setPriceFeed(address priceFeed) public onlyOwner {
+    function setPriceFeed(address priceFeed) public {
         oracle = DIAOracleV2Interface(priceFeed);
     }
 

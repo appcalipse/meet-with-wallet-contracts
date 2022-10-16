@@ -2,19 +2,19 @@
 pragma solidity >=0.8.4 <0.9.0;
 
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import "./MWWRegistarBase.sol";
+import "./AbstractPaidMeeting.sol";
 import "../prices/NativePriceLibrary.sol";
 
-/// @notice Main contract operations for Harmony network
+/// @notice Main contract operations for Polygon network
 /// @author 9tails.eth
-contract MWWRegistarHarmony is MWWRegistarBase {
-    AggregatorV3Interface priceFeed;
+contract PolygonPaidMeeting is AbstractPaidMeeting {
+    AggregatorV3Interface public priceFeed;
 
-    constructor(address[] memory acceptableTokenAddresses)
-        MWWRegistarBase(acceptableTokenAddresses)
+    constructor(address acceptableTokenAddresses)
+        AbstractPaidMeeting(acceptableTokenAddresses)
     {}
 
-    function setPriceFeed(address _priceFeedAddress) public onlyOwner {
+    function setPriceFeed(address _priceFeedAddress) public {
         priceFeed = AggregatorV3Interface(_priceFeedAddress);
     }
 
@@ -24,6 +24,6 @@ contract MWWRegistarHarmony is MWWRegistarBase {
         override
         returns (uint256 amountInNative, uint256 timestamp)
     {
-        return NativePriceLibrary.convertUsdToHarmony(priceFeed, usdPrice);
+        return NativePriceLibrary.convertUsdToPolygon(priceFeed, usdPrice);
     }
 }
