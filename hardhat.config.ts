@@ -31,8 +31,8 @@ const config: HardhatUserConfig = {
       url: `https://eth-mainnet.nodereal.io/v1/1659dfb40aa24bbb8153a677b98064d7`,
       accounts
     },
-    rinkeby: {
-      url: `https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161`,
+    goerli: {
+      url: `https://goerli.infura.io/v3/cb1145f032c843528e32188dad3c2286`,
       accounts
     },
     harmonyTest: {

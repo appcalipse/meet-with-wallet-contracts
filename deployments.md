@@ -33,11 +33,11 @@ Domain deployed to: 0xB054ef071881a35a276dc434D95BF087a957736b
 Registar deployed to: 0x13B5065B2586f0D457641b4C4FA09C2550843F42
 Domain deployed to: 0xECfd0052945e235a1E4aE78C02F05F802282cb74
 
-# Ethereum Rinkeby
+# Ethereum Goerli
 
-mockDAI deployed to: 0xCEaB09d857B7fB420C01BFFba2976F9D5eB38f0F
-Registar deployed to: 0x0B63ea2262CD64fE3A032Fc220b5352Ff98c7EA3
-Domain deployed to: 0xC1A78C9ce8FC447030eDff6728822cfd6fFc1948
+mockDAI deployed to: 0x2B1a67268BD808781bf5Eb761f1c43987dfa8E33
+Registar deployed to: 0xcc7f7D0Dd776a5ea17683eF6253DF8aCD3CBFA63
+Domain deployed to: 0xB95817e0F4D293E00F58eAcc4872273E9A9F764f
 
 # Ethereum Mainnet
 

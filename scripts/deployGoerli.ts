@@ -5,7 +5,7 @@
 // Runtime Environment's members available in the global scope.
 import { ethers } from "hardhat";
 
-const PRICE_FEED = "0x8A753747A1Fa494EC906cE90E9f37563A8AF630e" //https://docs.chain.link/docs/ethereum-addresses/
+const PRICE_FEED = "0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e" //https://docs.chain.link/docs/ethereum-addresses/
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
