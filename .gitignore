@@ -3,6 +3,7 @@ node_modules
 coverage
 coverage.json
 typechain
+typechain-types
 
 #Hardhat files
 cache
@@ -10,3 +11,5 @@ artifacts
 
 .DS_Store
 yarn-error.log
+gasReporterOutput.json
+solhint.json

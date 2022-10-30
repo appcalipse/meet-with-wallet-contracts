@@ -1,0 +1,80 @@
+name: CI
+on: [push, pull_request]
+
+env:
+  CI: true
+
+jobs:
+  ########
+  # LINT #
+  ########
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up environment
+        uses: ./.github/actions/setup
+      - run: yarn run lint:ci
+        continue-on-error: true
+      - name: Upload SolHint report
+        uses: actions/upload-artifact@v2
+        with:
+          name: solhint.json
+          path: solhint.json
+
+  #########
+  # TESTS #
+  #########
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Environment
+        uses: ./.github/actions/setup
+      - name: Run Tests
+        run: yarn run test:gas
+     
+
+  ###########
+  # SCRIPTS #
+  ###########
+  # scripts:
+  #   runs-on: ubuntu-latest
+
+  #   strategy:
+  #      matrix:
+  #        node-version: [16.x, 18.x]
+
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Install packages - Node ${{ matrix.node-version }}
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: ${{ matrix.node-version }}
+  #         cache: 'yarn'
+  #     - run: yarn --ignore-scripts
+  #       shell: bash
+  #     # - name: Create local node and deploy
+  #     #   run: |
+  #     #     yarn hardhat node &
+  #     #     yarn hardhat run scripts/deploy.ts --network localhost
+  #     - name: Run Tests
+  #       run: yarn run test:gas
+
+  ############
+  # COVERAGE #
+  ############
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up environment
+        uses: ./.github/actions/setup
+      - run: yarn run coverage
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
+      - name: Upload Coverage report
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage.json
+          path: coverage.json

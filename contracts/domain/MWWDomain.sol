@@ -14,6 +14,8 @@ library MWWStructs {
     }
 }
 
+/// @notice The main Meet With Wallet contract that handles the domain registration
+/// @author 9tails.eth
 contract MWWDomain is Ownable {
     mapping(address => bool) private admins;
     mapping(string => MWWStructs.Domain) public domains;
@@ -39,6 +41,11 @@ contract MWWDomain is Ownable {
         registerContract = _registar;
     }
 
+    ////////////////
+    // Structures //
+    ////////////////
+
+    /// @notice restrict execution for authorized admins only
     modifier onlyAdmin() {
         require(admins[msg.sender], "Only admin can do it");
         _;
@@ -52,14 +59,24 @@ contract MWWDomain is Ownable {
         _;
     }
 
+    //////////////////////
+    // Public Functions //
+    //////////////////////
+
+    /// @notice set the controller contract address that should be checked as caller
+    /// @param _address the registar address
     function setRegisterContract(address _address) public onlyOwner {
         registerContract = _address;
     }
 
+    /// @notice removes admin status from a specific address
+    /// @param admin the address to remove as admin
     function removeAdmin(address admin) public onlyOwner {
         admins[admin] = false;
     }
 
+    /// @notice adds admin status from a specific address
+    /// @param admin the address to add as admin
     function addAdmin(address admin) public onlyAdmin {
         admins[admin] = true;
     }
@@ -100,9 +117,7 @@ contract MWWDomain is Ownable {
 
         uint256 j = 0;
         uint256 size = domainDelegates[domain].length;
-        address[] memory auxDelegates = new address[](
-            size - 1
-        );
+        address[] memory auxDelegates = new address[](size - 1);
         for (uint256 i = 0; i < size; i++) {
             if (domainDelegates[domain][i] != delegate) {
                 auxDelegates[j] = domainDelegates[domain][i];
@@ -131,10 +146,12 @@ contract MWWDomain is Ownable {
             );
     }
 
-    function addDomains(
-        MWWStructs.Domain[] calldata domainsToAdd
-    ) public onlyAdmin returns (bool) {
-            uint256 size = domainsToAdd.length;
+    function addDomains(MWWStructs.Domain[] calldata domainsToAdd)
+        public
+        onlyAdmin
+        returns (bool)
+    {
+        uint256 size = domainsToAdd.length;
         for (uint256 i = 0; i < size; i++) {
             MWWStructs.Domain calldata domain = domainsToAdd[i];
             _subscribe(
