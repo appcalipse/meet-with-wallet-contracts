@@ -6,7 +6,10 @@ import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
-import "@nomiclabs/hardhat-etherscan";
+import "@matterlabs/hardhat-zksync-deploy";
+import "@matterlabs/hardhat-zksync-solc";
+import "@matterlabs/hardhat-zksync-verify";
+import "@nomiclabs/hardhat-ethers";
 
 dotenv.config();
 
@@ -24,20 +27,21 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // Go to https://hardhat.org/config/ to learn more
 
 const accounts =  process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
+
 const config: HardhatUserConfig = {
-  solidity: "0.8.4",
+  solidity: "0.8.17",
   networks: {
     ethereum: {
       url: `https://eth-mainnet.nodereal.io/v1/1659dfb40aa24bbb8153a677b98064d7`,
-      accounts
+      accounts,
     },
     goerli: {
       url: `https://goerli.infura.io/v3/cb1145f032c843528e32188dad3c2286`,
-      accounts
+      accounts,
     },
     harmonyTest: {
       url: `https://api.s0.b.hmny.io`,
-      accounts
+      accounts,
     },
     harmonyMainnet: {
       url: `https://api.s0.t.hmny.io`,
@@ -46,20 +50,31 @@ const config: HardhatUserConfig = {
     },
     metisStardust: {
       url: `https://stardust.metis.io/?owner=588`,
-      accounts
+      accounts,
     },
     metisAndromeda: {
       url: `https://andromeda.metis.io/?owner=1088`,
-      accounts
+      accounts,
     },
     polygonMumbai: {
       url: `https://matic-mumbai.chainstacklabs.com`,
-      accounts
+      accounts,
     },
     matic: {
       url: `https://polygon-rpc.com`,
-      accounts
+      accounts,
     },
+    zkSyncEraTestnet: {
+      url: "https://testnet.era.zksync.dev",
+      ethNetwork: "goerli",
+      zksync: true,
+    },
+    zkSyncEraMainnet: {
+      url: "https://mainnet.era.zksync.io",
+      ethNetwork: "mainnet",
+      zksync: true,
+      verifyURL: "https://zksync2-mainnet-explorer.zksync.io/contract_verification"
+    }
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
