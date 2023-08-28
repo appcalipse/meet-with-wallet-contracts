@@ -1,6 +1,6 @@
 {
   "name": "meet-with-wallet-contracts",
-  "license": "MIT",
+  "license": "GNU GPLv3",
   "scripts": {
     "coverage": "env COVERAGE=true hardhat coverage",
     "clean": "hardhat clean",
